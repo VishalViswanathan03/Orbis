@@ -26,7 +26,10 @@
     "audio-player",
     "orbis"
   ],
-  "author": "Orbis Team",
+  "author": {
+    "name": "Vishal-VN",
+    "email": "179101022+Vishal-VN@users.noreply.github.com"
+  },
   "license": "GPL-2.0-or-later",
   "dependencies": {
     "clsx": "^2.1.1",
