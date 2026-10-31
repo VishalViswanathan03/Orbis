@@ -1,6 +1,5 @@
 import React, { useRef, useState } from 'react';
 import { usePlayer } from '../context/PlayerContext';
-import { OrbisLogo } from './OrbisLogo';
 import {
   FolderOpen,
   Globe,
@@ -9,7 +8,6 @@ import {
   ListMusic,
   PlaySquare,
   Library,
-  Palette,
   Sun,
   Moon,
 } from 'lucide-react';
@@ -51,7 +49,7 @@ export const Header: React.FC = () => {
   const isDark = themeMode === 'dark';
 
   return (
-    <header className={`relative h-15 px-5 flex items-center justify-between border-b transition-colors duration-200 select-none z-40 ${
+    <header className={`h-14 px-3 sm:px-5 flex items-center justify-between gap-2 border-b transition-colors duration-200 select-none z-40 ${
       isDark
         ? 'bg-[#0E1118]/90 border-white/5 text-slate-100 backdrop-blur-xl'
         : 'bg-white/90 border-slate-200 text-slate-800 backdrop-blur-xl'
@@ -65,72 +63,76 @@ export const Header: React.FC = () => {
         className="hidden"
       />
 
-      {/* Left: Brand Identity (Clean Minimalist Wordmark) */}
-      <div className="flex items-center space-x-3">
+      {/* Left: Brand Wordmark (Non-colliding) */}
+      <div className="flex items-center shrink-0">
         <div
           onClick={() => setCurrentView('player')}
           className="flex items-center cursor-pointer group"
+          title="Orbis Player"
         >
-          <span className={`font-black text-2xl tracking-tighter lowercase flex items-center transition-colors ${
+          <span className={`font-black text-xl sm:text-2xl tracking-tighter lowercase flex items-center transition-colors ${
             isDark ? 'text-white' : 'text-slate-900'
           }`}>
             <span>orbis</span>
             <span
-              className="w-2 h-2 rounded-full ml-1.5 inline-block shadow-sm transition-transform group-hover:scale-125"
+              className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full ml-1 sm:ml-1.5 inline-block shadow-sm transition-transform group-hover:scale-125"
               style={{ backgroundColor: accentColor }}
             />
           </span>
         </div>
       </div>
 
-      {/* Center: Absolute Pixel-Perfect Screen Centering for View Switcher */}
-      <div className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center p-1 rounded-full border transition-colors shadow-sm ${
-        isDark ? 'bg-white/5 border-white/10' : 'bg-slate-100 border-slate-200'
-      }`}>
-        <button
-          onClick={() => setCurrentView('player')}
-          className={`flex items-center space-x-1.5 px-4 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 ${
-            currentView === 'player'
-              ? 'text-white shadow-sm'
-              : isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'
-          }`}
-          style={currentView === 'player' ? { backgroundColor: accentColor } : {}}
-        >
-          <PlaySquare size={13} />
-          <span>Player</span>
-        </button>
+      {/* Center: Dynamically Positioned View Capsule (Adapts to Window Width without Overlapping) */}
+      <div className="flex-1 flex justify-center items-center min-w-0 px-1 sm:px-2">
+        <div className={`flex items-center p-0.5 sm:p-1 rounded-full border transition-colors shadow-sm shrink-0 ${
+          isDark ? 'bg-white/5 border-white/10' : 'bg-slate-100 border-slate-200'
+        }`}>
+          <button
+            onClick={() => setCurrentView('player')}
+            className={`flex items-center space-x-1.5 px-3 sm:px-4 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 ${
+              currentView === 'player'
+                ? 'text-white shadow-sm'
+                : isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'
+            }`}
+            style={currentView === 'player' ? { backgroundColor: accentColor } : {}}
+            title="Player View"
+          >
+            <PlaySquare size={14} />
+            <span className="hidden sm:inline">Player</span>
+          </button>
 
-        <button
-          onClick={() => setCurrentView('library')}
-          className={`flex items-center space-x-1.5 px-4 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 ${
-            currentView === 'library'
-              ? 'text-white shadow-sm'
-              : isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'
-          }`}
-          style={currentView === 'library' ? { backgroundColor: accentColor } : {}}
-        >
-          <Library size={13} />
-          <span>Library</span>
-        </button>
+          <button
+            onClick={() => setCurrentView('library')}
+            className={`flex items-center space-x-1.5 px-3 sm:px-4 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 ${
+              currentView === 'library'
+                ? 'text-white shadow-sm'
+                : isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'
+            }`}
+            style={currentView === 'library' ? { backgroundColor: accentColor } : {}}
+            title="Library View"
+          >
+            <Library size={14} />
+            <span className="hidden sm:inline">Library</span>
+          </button>
+        </div>
       </div>
 
-      {/* Right: Modern Actions */}
-      <div className="flex items-center space-x-1.5">
-        {/* Open Files */}
+      {/* Right: Minimized Icon Actions (Clean logos without text) */}
+      <div className="flex items-center space-x-1 shrink-0">
+        {/* Open Files (Icon-only) */}
         <button
           onClick={() => fileInputRef.current?.click()}
-          className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-full border text-xs font-medium transition-colors ${
+          className={`p-2 rounded-full border transition-colors ${
             isDark
-              ? 'bg-white/5 hover:bg-white/10 border-white/10 text-slate-300 hover:text-white'
-              : 'bg-slate-100 hover:bg-slate-200 border-slate-200 text-slate-700 hover:text-black'
+              ? 'bg-white/5 hover:bg-white/10 border-white/10'
+              : 'bg-slate-100 hover:bg-slate-200 border-slate-200'
           }`}
-          title="Open Local Files"
+          title="Open Media Files"
         >
-          <FolderOpen size={14} style={{ color: accentColor }} />
-          <span className="hidden sm:inline">Open</span>
+          <FolderOpen size={15} style={{ color: accentColor }} />
         </button>
 
-        {/* Network Stream */}
+        {/* Network Stream URL */}
         <button
           onClick={() => setIsStreamModalOpen(true)}
           className={`p-2 rounded-full border transition-colors ${
@@ -138,12 +140,12 @@ export const Header: React.FC = () => {
               ? 'bg-white/5 hover:bg-white/10 border-white/10 text-slate-300 hover:text-white'
               : 'bg-slate-100 hover:bg-slate-200 border-slate-200 text-slate-700 hover:text-black'
           }`}
-          title="Open Stream URL"
+          title="Open Network Stream"
         >
           <Globe size={15} />
         </button>
 
-        {/* Audio EQ */}
+        {/* Audio Equalizer */}
         <button
           onClick={() => setIsEqualizerOpen(true)}
           className={`p-2 rounded-full border transition-colors ${
@@ -156,7 +158,7 @@ export const Header: React.FC = () => {
           <Sliders size={15} />
         </button>
 
-        {/* Video Effects */}
+        {/* Video Adjustments */}
         <button
           onClick={() => setIsVideoEffectsOpen(true)}
           className={`p-2 rounded-full border transition-colors ${
@@ -191,13 +193,13 @@ export const Header: React.FC = () => {
                 ? 'bg-white/5 hover:bg-white/10 border-white/10'
                 : 'bg-slate-100 hover:bg-slate-200 border-slate-200'
             }`}
-            title="Theme Color"
+            title="Change Theme Color"
           >
             <div className="w-3.5 h-3.5 rounded-full" style={{ backgroundColor: accentColor }} />
           </button>
 
           {showColorPicker && (
-            <div className={`absolute right-0 mt-2 p-2.5 rounded-2xl border shadow-xl z-50 flex items-center space-x-2 animate-scale-in ${
+            <div className={`absolute right-0 mt-2 p-2 rounded-2xl border shadow-xl z-50 flex items-center space-x-1.5 animate-scale-in ${
               isDark ? 'bg-surface-high border-white/10' : 'bg-white border-slate-200'
             }`}>
               {ACCENT_COLORS.map(c => (
@@ -207,7 +209,7 @@ export const Header: React.FC = () => {
                     setAccentColor(c.color);
                     setShowColorPicker(false);
                   }}
-                  className="w-6 h-6 rounded-full transition-transform hover:scale-125 border-2"
+                  className="w-5.5 h-5.5 rounded-full transition-transform hover:scale-125 border-2"
                   style={{
                     backgroundColor: c.color,
                     borderColor: accentColor === c.color ? (isDark ? '#FFF' : '#000') : 'transparent',
@@ -219,12 +221,12 @@ export const Header: React.FC = () => {
           )}
         </div>
 
-        <div className={`h-4 w-px mx-1 ${isDark ? 'bg-white/10' : 'bg-slate-200'}`} />
+        <div className={`h-4 w-px mx-0.5 ${isDark ? 'bg-white/10' : 'bg-slate-200'}`} />
 
-        {/* Queue / Play Next Toggle Pill */}
+        {/* Queue / Play Next Toggle (Icon + Count Badge) */}
         <button
           onClick={() => setIsQueueOpen(prev => !prev)}
-          className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-full border transition-all ${
+          className={`flex items-center space-x-1 px-2.5 py-1.5 rounded-full border transition-all ${
             isQueueOpen
               ? 'text-white border-transparent'
               : isDark
@@ -232,10 +234,9 @@ export const Header: React.FC = () => {
                 : 'bg-slate-100 text-slate-700 hover:text-black border-slate-200'
           }`}
           style={isQueueOpen ? { backgroundColor: accentColor } : {}}
-          title="Play Next Queue"
+          title="Up Next Queue"
         >
-          <ListMusic size={14} />
-          <span className="text-xs font-semibold">Queue</span>
+          <ListMusic size={15} />
           <span className="text-[10px] font-bold px-1.5 py-0.2 rounded-full bg-black/20 text-white min-w-4 text-center">
             {queue.length}
           </span>
