@@ -1,12 +1,11 @@
-# Orbis — Next-Generation Modern VLC Media Player
-
 <p align="center">
-  <img src="public/orbis-cone.svg" width="120" height="120" alt="Orbis Logo" />
+  <h1 align="center" style="font-size: 3.8rem; letter-spacing: -2.5px; font-weight: 900; margin-bottom: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">orbis<span style="color: #FF7A00;">•</span></h1>
+  <p align="center"><em>The Next-Generation Modern VLC Media Experience</em></p>
 </p>
 
 <p align="center">
-  <strong>A futuristic Material Design 3 overhaul inspired by VideoLAN VLC Media Player.</strong><br/>
-  Featuring ultra-curved floating glassmorphism, dynamic Material You theming, a brand-new media library, dual-zone drag-and-drop, and an interactive Play Next queue.
+  <strong>A modern, curved Material Design 3 overhaul inspired by VideoLAN VLC Media Player.</strong><br/>
+  Featuring floating glassmorphism, dynamic Material You theming, a clean media library, dual-zone drag-and-drop, and an interactive Play Next queue.
 </p>
 
 ---
