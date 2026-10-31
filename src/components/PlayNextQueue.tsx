@@ -112,8 +112,17 @@ export const PlayNextQueue: React.FC = () => {
       </div>
 
       {/* Queue Items */}
-      <div className="flex-1 overflow-y-auto p-2.5 space-y-1.5 custom-scrollbar">
-        {queue.map((item, index) => {
+      <div className="flex-1 overflow-y-auto p-2.5 space-y-1.5 custom-scrollbar flex flex-col">
+        {queue.length === 0 ? (
+          <div className="flex-1 flex flex-col items-center justify-center p-6 text-center opacity-60 select-none">
+            <ListMusic size={28} className="mb-2" />
+            <p className="text-xs font-semibold">Queue is empty</p>
+            <p className="text-[11px] text-slate-400 mt-1 max-w-[200px]">
+              Drag files or click Play Next on any video to build your list
+            </p>
+          </div>
+        ) : (
+          queue.map((item, index) => {
           const isCurrentlyPlaying = queueIndex === index;
           const isDragging = draggedIndex === index;
           const isOver = dragOverIndex === index;
@@ -218,7 +227,8 @@ export const PlayNextQueue: React.FC = () => {
               </div>
             </div>
           );
-        })}
+        })
+      )}
       </div>
     </aside>
   );

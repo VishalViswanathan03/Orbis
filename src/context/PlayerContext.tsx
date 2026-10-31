@@ -112,16 +112,16 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
   // Library & Initial Queue
   const [libraryItems, setLibraryItems] = useState<MediaItem[]>(() => {
-    const saved = localStorage.getItem('orbis_library_v2');
+    const saved = localStorage.getItem('orbis_library_v3');
     if (saved) {
       try { return JSON.parse(saved); } catch (e) { /* ignore */ }
     }
-    return SAMPLE_MEDIA;
+    return [];
   });
 
-  const [queue, setQueue] = useState<MediaItem[]>([SAMPLE_MEDIA[0], SAMPLE_MEDIA[1], SAMPLE_MEDIA[4]]);
+  const [queue, setQueue] = useState<MediaItem[]>([]);
   const [queueIndex, setQueueIndex] = useState<number>(0);
-  const [currentMedia, setCurrentMedia] = useState<MediaItem | null>(SAMPLE_MEDIA[0]);
+  const [currentMedia, setCurrentMedia] = useState<MediaItem | null>(null);
 
   // Theme Mode
   const [themeMode, setThemeMode] = useState<'dark' | 'light'>(() => {
@@ -182,7 +182,7 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
   // Save library changes
   useEffect(() => {
-    localStorage.setItem('orbis_library_v2', JSON.stringify(libraryItems));
+    localStorage.setItem('orbis_library_v3', JSON.stringify(libraryItems));
   }, [libraryItems]);
 
   const resetVideoFilters = () => {

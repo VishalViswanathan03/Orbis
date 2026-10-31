@@ -181,10 +181,17 @@ export const LibraryView: React.FC = () => {
           isDark ? 'border-white/10 text-slate-400' : 'border-slate-200 text-slate-500'
         }`}>
           <Film size={36} className="mb-2 opacity-40" />
-          <h3 className="text-sm font-semibold">No media items found</h3>
+          <h3 className="text-sm font-semibold">Your library is empty</h3>
           <p className="text-xs mt-1 max-w-xs opacity-70">
-            Import media from your hard drive or drag files directly onto the window.
+            Open media from your hard drive, drop files anywhere into Orbis, or enter a stream URL.
           </p>
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            className="mt-4 px-4 py-2 rounded-full text-xs font-semibold text-white shadow-sm hover:scale-105 active:scale-95 transition-all"
+            style={{ backgroundColor: accentColor }}
+          >
+            Open Media Files
+          </button>
         </div>
       ) : viewMode === 'grid' ? (
         /* GRID VIEW */

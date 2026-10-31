@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { usePlayer } from '../context/PlayerContext';
 import { FloatingControls } from './FloatingControls';
-import { Play, Pause, Music, AlertCircle, RefreshCw } from 'lucide-react';
+import { Play, Pause, Music, AlertCircle, RefreshCw, FolderOpen, Globe } from 'lucide-react';
 
 export const Player: React.FC = () => {
   const {
@@ -26,6 +26,7 @@ export const Player: React.FC = () => {
     subtitleConfig,
     accentColor,
     themeMode,
+    setIsStreamModalOpen,
     mediaRef,
   } = usePlayer();
 
@@ -347,23 +348,69 @@ export const Player: React.FC = () => {
         </div>
       )}
 
-      {/* Floating Bottom HUD Controls */}
-      <div
-        onClick={e => e.stopPropagation()}
-        className={`controls-container absolute bottom-5 left-0 right-0 z-30 transition-all duration-300 ease-out pointer-events-auto ${
-          controlsVisible
-            ? 'opacity-100 translate-y-0 scale-100'
-            : 'opacity-0 translate-y-16 scale-95 pointer-events-none'
-        }`}
-      >
-        <FloatingControls
-          onToggleFullscreen={toggleFullscreen}
-          isFullscreen={isFullscreen}
-          onTogglePiP={togglePiP}
-          isPiP={isPiP}
-          onMinimize={() => setControlsVisible(false)}
-        />
-      </div>
+      {/* Empty State (When no media is loaded) */}
+      {!currentMedia && (
+        <div className="flex flex-col items-center justify-center p-8 text-center max-w-md animate-fade-in select-none">
+          <div className="flex items-center space-x-1 mb-3">
+            <span className={`font-black text-4xl tracking-tighter lowercase flex items-center ${
+              isDark ? 'text-white' : 'text-slate-800'
+            }`}>
+              <span>orbis</span>
+              <span
+                className="w-2.5 h-2.5 rounded-full ml-1.5 inline-block shadow-md animate-pulse-subtle"
+                style={{ backgroundColor: accentColor }}
+              />
+            </span>
+          </div>
+          <p className="text-xs text-slate-400 mb-6 max-w-xs leading-relaxed">
+            Drop any video or audio file anywhere on the screen, or open media from your computer.
+          </p>
+          <div className="flex items-center space-x-3">
+            <button
+              onClick={() => {
+                const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+                fileInput?.click();
+              }}
+              className="flex items-center space-x-2 px-5 py-2.5 rounded-full text-xs font-bold text-white shadow-md hover:scale-105 active:scale-95 transition-all"
+              style={{ backgroundColor: accentColor }}
+            >
+              <FolderOpen size={14} />
+              <span>Open File</span>
+            </button>
+            <button
+              onClick={() => setIsStreamModalOpen(true)}
+              className={`flex items-center space-x-2 px-5 py-2.5 rounded-full border text-xs font-semibold transition-all ${
+                isDark
+                  ? 'bg-white/5 hover:bg-white/10 border-white/10 text-slate-200 hover:text-white'
+                  : 'bg-slate-200/80 hover:bg-slate-300 border-slate-300 text-slate-700 hover:text-black'
+              }`}
+            >
+              <Globe size={14} />
+              <span>Stream URL</span>
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Floating Bottom HUD Controls (Only if media is loaded) */}
+      {currentMedia && (
+        <div
+          onClick={e => e.stopPropagation()}
+          className={`controls-container absolute bottom-5 left-0 right-0 z-30 transition-all duration-300 ease-out pointer-events-auto ${
+            controlsVisible
+              ? 'opacity-100 translate-y-0 scale-100'
+              : 'opacity-0 translate-y-16 scale-95 pointer-events-none'
+          }`}
+        >
+          <FloatingControls
+            onToggleFullscreen={toggleFullscreen}
+            isFullscreen={isFullscreen}
+            onTogglePiP={togglePiP}
+            isPiP={isPiP}
+            onMinimize={() => setControlsVisible(false)}
+          />
+        </div>
+      )}
 
       {/* Gentle Error Notification Toast */}
       {hasError && (
