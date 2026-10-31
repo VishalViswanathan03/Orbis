@@ -250,12 +250,22 @@ export const Player: React.FC = () => {
     }
   };
 
+  const handleScreenClick = (e: React.MouseEvent) => {
+    // Only toggle if clicked directly on the video viewport or container, not on controls
+    if ((e.target as HTMLElement).closest('.controls-container')) return;
+    setControlsVisible(prev => !prev);
+  };
+
   return (
     <div
       ref={containerRef}
-      onMouseMove={showControlsTemporarily}
-      onMouseEnter={showControlsTemporarily}
-      className={`relative flex-1 flex items-center justify-center overflow-hidden select-none transition-colors ${
+      onMouseMove={() => {
+        if (!controlsVisible) {
+          // If controls are hidden, keep them hidden on minor mouse movement unless clicked or near bottom
+        }
+      }}
+      onClick={handleScreenClick}
+      className={`relative flex-1 flex items-center justify-center overflow-hidden select-none transition-colors cursor-pointer ${
         isDark ? 'bg-black' : 'bg-slate-950'
       }`}
     >
@@ -265,10 +275,9 @@ export const Player: React.FC = () => {
           ref={mediaRef}
           src={currentMedia.url}
           style={filterStyle}
-          className={`${getAspectRatioClass()} max-h-full transition-all duration-200 cursor-pointer ${
+          className={`${getAspectRatioClass()} max-h-full transition-all duration-200 ${
             currentMedia.type === 'audio' ? 'opacity-0 absolute pointer-events-none' : 'block'
           }`}
-          onClick={togglePlay}
           onDoubleClick={toggleFullscreen}
           onTimeUpdate={e => setCurrentTime(e.currentTarget.currentTime)}
           onLoadedMetadata={e => {
@@ -281,7 +290,6 @@ export const Player: React.FC = () => {
           onPlay={() => setIsPlaying(true)}
           onPause={() => setIsPlaying(false)}
           onError={() => {
-            // Only set error if there is an actual source that failed
             if (currentMedia?.url) {
               setHasError(true);
               setErrorMessage("Stream format unreachable or offline.");
@@ -290,21 +298,6 @@ export const Player: React.FC = () => {
           onLoadedData={() => setHasError(false)}
           playsInline
         />
-      )}
-
-      {/* Center Subtle Play Button (Visible when paused on video) */}
-      {!isPlaying && currentMedia?.type === 'video' && (
-        <div
-          onClick={togglePlay}
-          className="absolute inset-0 flex items-center justify-center cursor-pointer pointer-events-auto bg-black/20 backdrop-blur-[1px] transition-opacity animate-fade-in"
-        >
-          <div
-            className="w-16 h-16 rounded-full flex items-center justify-center text-white shadow-2xl hover:scale-110 active:scale-95 transition-transform"
-            style={{ backgroundColor: `${accentColor}E6` }}
-          >
-            <Play size={26} className="fill-white translate-x-0.5" />
-          </div>
-        </div>
       )}
 
       {/* Audio Visualizer Viewport (When playing music) */}
@@ -356,8 +349,11 @@ export const Player: React.FC = () => {
 
       {/* Floating Bottom HUD Controls */}
       <div
-        className={`absolute bottom-5 left-0 right-0 z-30 transition-all duration-300 pointer-events-auto ${
-          controlsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'
+        onClick={e => e.stopPropagation()}
+        className={`controls-container absolute bottom-5 left-0 right-0 z-30 transition-all duration-300 ease-out pointer-events-auto ${
+          controlsVisible
+            ? 'opacity-100 translate-y-0 scale-100'
+            : 'opacity-0 translate-y-16 scale-95 pointer-events-none'
         }`}
       >
         <FloatingControls
@@ -365,6 +361,7 @@ export const Player: React.FC = () => {
           isFullscreen={isFullscreen}
           onTogglePiP={togglePiP}
           isPiP={isPiP}
+          onMinimize={() => setControlsVisible(false)}
         />
       </div>
 

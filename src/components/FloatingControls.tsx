@@ -20,6 +20,7 @@ import {
   Subtitles,
   Gauge,
   Ratio,
+  ChevronDown,
 } from 'lucide-react';
 
 interface FloatingControlsProps {
@@ -27,6 +28,7 @@ interface FloatingControlsProps {
   isFullscreen: boolean;
   onTogglePiP: () => void;
   isPiP: boolean;
+  onMinimize?: () => void;
 }
 
 const formatTime = (seconds: number) => {
@@ -44,6 +46,7 @@ export const FloatingControls: React.FC<FloatingControlsProps> = ({
   onToggleFullscreen,
   isFullscreen,
   onTogglePiP,
+  onMinimize,
 }) => {
   const {
     currentMedia,
@@ -110,8 +113,8 @@ export const FloatingControls: React.FC<FloatingControlsProps> = ({
       {/* Sleek Floating Glass Capsule */}
       <div className={`relative backdrop-blur-2xl rounded-3xl p-3 px-5 shadow-2xl border transition-all duration-300 ${
         isDark
-          ? 'bg-[#12151D]/85 border-white/10 shadow-[0_12px_40px_rgba(0,0,0,0.6)]'
-          : 'bg-white/85 border-slate-200 shadow-[0_12px_40px_rgba(0,0,0,0.1)]'
+          ? 'bg-[#12151D]/90 border-white/10 shadow-[0_12px_40px_rgba(0,0,0,0.6)]'
+          : 'bg-white/90 border-slate-200 shadow-[0_12px_40px_rgba(0,0,0,0.1)]'
       }`}>
         
         {/* Progress Timeline Track */}
@@ -125,7 +128,7 @@ export const FloatingControls: React.FC<FloatingControlsProps> = ({
               setHoverPosition(null);
             }}
             onMouseMove={handleTimelineMouseMove}
-            className={`group relative h-2 hover:h-3 rounded-full cursor-pointer transition-all duration-200 flex items-center ${
+            className={`group relative h-2 hover:h-2.5 rounded-full cursor-pointer transition-all duration-200 flex items-center ${
               isDark ? 'bg-white/10' : 'bg-slate-200'
             }`}
           >
@@ -155,7 +158,7 @@ export const FloatingControls: React.FC<FloatingControlsProps> = ({
           </div>
 
           {/* Time & Badges Bar */}
-          <div className="flex justify-between items-center text-[11px] font-mono mt-1 px-1 opacity-70">
+          <div className="flex justify-between items-center text-[11px] font-mono mt-1 px-0.5 opacity-70">
             <span>{formatTime(currentTime)}</span>
             <div className="flex items-center space-x-2">
               {currentMedia?.resolution && (
@@ -170,11 +173,11 @@ export const FloatingControls: React.FC<FloatingControlsProps> = ({
           </div>
         </div>
 
-        {/* Action Controls Row */}
-        <div className="flex items-center justify-between">
+        {/* Action Controls: 3-Column Grid for 100% Mathematical Centering */}
+        <div className="grid grid-cols-[1fr_auto_1fr] items-center">
           
-          {/* Left: Volume & Auxiliary */}
-          <div className="flex items-center space-x-1">
+          {/* Left Column: Volume, Shuffle, Repeat */}
+          <div className="flex items-center space-x-1 justify-start">
             <button
               onClick={cycleRepeat}
               className={`p-2 rounded-full transition-colors ${
@@ -240,8 +243,8 @@ export const FloatingControls: React.FC<FloatingControlsProps> = ({
             </div>
           </div>
 
-          {/* Center: Playback FAB & Skips */}
-          <div className="flex items-center space-x-2">
+          {/* Center Column: Playback FAB & Skips (Dead Center) */}
+          <div className="flex items-center space-x-2.5 justify-center">
             <button
               onClick={prevTrack}
               className={`p-2 rounded-full transition-colors ${
@@ -262,7 +265,7 @@ export const FloatingControls: React.FC<FloatingControlsProps> = ({
               <RotateCcw size={14} />
             </button>
 
-            {/* Main Play / Pause Circle */}
+            {/* Main Play / Pause Circle (Center aligned) */}
             <button
               onClick={togglePlay}
               className="w-11 h-11 rounded-full flex items-center justify-center text-white shadow-md hover:scale-105 active:scale-95 transition-all"
@@ -272,7 +275,7 @@ export const FloatingControls: React.FC<FloatingControlsProps> = ({
               {isPlaying ? (
                 <Pause size={18} className="fill-white" />
               ) : (
-                <Play size={18} className="fill-white translate-x-0.5" />
+                <Play size={18} className="fill-white translate-x-[0.5px]" />
               )}
             </button>
 
@@ -297,8 +300,8 @@ export const FloatingControls: React.FC<FloatingControlsProps> = ({
             </button>
           </div>
 
-          {/* Right: Tools & Fullscreen */}
-          <div className="flex items-center space-x-1">
+          {/* Right Column: Speed, Aspect, Subtitles, PiP, Fullscreen, Minimize */}
+          <div className="flex items-center space-x-1 justify-end">
             {/* Speed */}
             <div className="relative">
               <button
@@ -316,7 +319,7 @@ export const FloatingControls: React.FC<FloatingControlsProps> = ({
 
               {showSpeedMenu && (
                 <div className={`absolute bottom-9 right-0 p-1.5 rounded-xl border shadow-xl z-50 flex flex-col space-y-0.5 min-w-20 ${
-                  isDark ? 'bg-surface-high border-white/10' : 'bg-white border-slate-200'
+                  isDark ? 'bg-[#181C26] border-white/10' : 'bg-white border-slate-200'
                 }`}>
                   {[0.5, 0.75, 1, 1.25, 1.5, 2].map(r => (
                     <button
@@ -352,7 +355,7 @@ export const FloatingControls: React.FC<FloatingControlsProps> = ({
 
               {showAspectMenu && (
                 <div className={`absolute bottom-9 right-0 p-1.5 rounded-xl border shadow-xl z-50 flex flex-col space-y-0.5 min-w-24 ${
-                  isDark ? 'bg-surface-high border-white/10' : 'bg-white border-slate-200'
+                  isDark ? 'bg-[#181C26] border-white/10' : 'bg-white border-slate-200'
                 }`}>
                   {(['fit', 'fill', '16:9', '4:3', '21:9'] as AspectRatio[]).map(r => (
                     <button
@@ -409,6 +412,19 @@ export const FloatingControls: React.FC<FloatingControlsProps> = ({
             >
               {isFullscreen ? <Minimize size={15} /> : <Maximize size={15} />}
             </button>
+
+            {/* Minimize Controls Button */}
+            {onMinimize && (
+              <button
+                onClick={onMinimize}
+                className={`p-2 rounded-full transition-colors ${
+                  isDark ? 'text-slate-400 hover:text-white' : 'text-slate-500 hover:text-black'
+                }`}
+                title="Minimize Controls (or click screen)"
+              >
+                <ChevronDown size={15} />
+              </button>
+            )}
           </div>
 
         </div>

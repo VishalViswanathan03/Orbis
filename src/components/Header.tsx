@@ -65,23 +65,21 @@ export const Header: React.FC = () => {
         className="hidden"
       />
 
-      {/* Left: Brand Identity */}
+      {/* Left: Brand Identity (Clean Minimalist Wordmark) */}
       <div className="flex items-center space-x-3">
         <div
           onClick={() => setCurrentView('player')}
-          className="flex items-center space-x-2.5 cursor-pointer group"
+          className="flex items-center cursor-pointer group"
         >
-          <OrbisLogo size={32} className="group-hover:scale-105 transition-transform" />
-          <div className="flex items-baseline space-x-1.5">
-            <span className="font-bold text-lg tracking-tight bg-gradient-to-r from-orbis-500 to-amber-500 bg-clip-text text-transparent">
-              Orbis
-            </span>
-            <span className={`text-[10px] font-semibold uppercase tracking-wider ${
-              isDark ? 'text-slate-400' : 'text-slate-500'
-            }`}>
-              Media
-            </span>
-          </div>
+          <span className={`font-black text-2xl tracking-tighter lowercase flex items-center transition-colors ${
+            isDark ? 'text-white' : 'text-slate-900'
+          }`}>
+            <span>orbis</span>
+            <span
+              className="w-2 h-2 rounded-full ml-1.5 inline-block shadow-sm transition-transform group-hover:scale-125"
+              style={{ backgroundColor: accentColor }}
+            />
+          </span>
         </div>
       </div>
 
