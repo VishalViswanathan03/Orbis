@@ -27,10 +27,14 @@ function createWindow() {
 
   Menu.setApplicationMenu(null);
 
-  // Load Vite dev server if running, fallback to dist/index.html
-  mainWindow.loadURL('http://localhost:5173').catch(() => {
+  // In production load packaged dist directly; in dev try localhost:5173
+  if (app.isPackaged) {
     mainWindow.loadFile(path.join(__dirname, '../dist/index.html'));
-  });
+  } else {
+    mainWindow.loadURL('http://localhost:5173').catch(() => {
+      mainWindow.loadFile(path.join(__dirname, '../dist/index.html'));
+    });
+  }
 
   mainWindow.once('ready-to-show', () => {
     mainWindow.show();

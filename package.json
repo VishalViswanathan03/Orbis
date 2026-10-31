@@ -1,6 +1,6 @@
 {
   "name": "orbis-media-player",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Orbis - The universal high-performance Material Design 3 media player",
   "main": "electron/main.cjs",
   "type": "module",

@@ -82,6 +82,7 @@ interface PlayerContextType {
 
   // Library
   libraryItems: MediaItem[];
+  setLibraryItems: React.Dispatch<React.SetStateAction<MediaItem[]>>;
   libraryCategory: LibraryCategory;
   setLibraryCategory: (cat: LibraryCategory) => void;
   searchQuery: string;
@@ -427,6 +428,41 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
   return (
     <PlayerContext.Provider value={{
+        currentMedia,
+        isPlaying,
+        setIsPlaying,
+        currentTime,
+        setCurrentTime,
+        duration,
+        setDuration,
+        volume,
+        isMuted,
+        playbackRate,
+        aspectRatio,
+        repeatMode,
+        isShuffle,
+        currentView,
+        setCurrentView,
+        isQueueOpen,
+        setIsQueueOpen,
+        queue,
+        queueIndex,
+        playMedia,
+        playNext,
+        addToQueue,
+        reorderQueue,
+        removeFromQueue,
+        clearQueue,
+        nextTrack,
+        prevTrack,
+        togglePlay,
+        seek,
+        setVolumeLevel,
+        toggleMute,
+        setPlaybackRate,
+        setAspectRatio,
+        setRepeatMode,
+        setIsShuffle,
         videoFilters,
         setVideoFilters,
         resetVideoFilters,
@@ -447,6 +483,7 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         isStreamModalOpen,
         setIsStreamModalOpen,
         libraryItems,
+        setLibraryItems,
         libraryCategory,
         setLibraryCategory,
         searchQuery,
