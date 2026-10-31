@@ -40,13 +40,22 @@ jobs:
       - name: Build Web Assets (Vite)
         run: npm run build
 
-      - name: Build and Publish Electron Package
+      - name: Build and Publish Electron Package (Windows Signed)
+        if: matrix.os == 'windows-latest'
         uses: samuelmeuli/action-electron-builder@v1
         env:
-          WIN_CSC_LINK: ${{ matrix.os == 'windows-latest' && secrets.WIN_CSC_LINK || '' }}
-          WIN_CSC_KEY_PASSWORD: ${{ matrix.os == 'windows-latest' && secrets.WIN_CSC_KEY_PASSWORD || '' }}
-          CSC_LINK: ${{ matrix.os == 'windows-latest' && secrets.WIN_CSC_LINK || '' }}
-          CSC_KEY_PASSWORD: ${{ matrix.os == 'windows-latest' && secrets.WIN_CSC_KEY_PASSWORD || '' }}
+          CSC_LINK: ${{ secrets.WIN_CSC_LINK }}
+          CSC_KEY_PASSWORD: ${{ secrets.WIN_CSC_KEY_PASSWORD }}
+          WIN_CSC_LINK: ${{ secrets.WIN_CSC_LINK }}
+          WIN_CSC_KEY_PASSWORD: ${{ secrets.WIN_CSC_KEY_PASSWORD }}
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          release: true
+          build_script_name: build
+
+      - name: Build and Publish Electron Package (macOS & Linux)
+        if: matrix.os != 'windows-latest'
+        uses: samuelmeuli/action-electron-builder@v1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           release: true
