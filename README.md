@@ -1,10 +1,10 @@
 <p align="center">
   <h1 align="center" style="font-size: 3.8rem; letter-spacing: -2.5px; font-weight: 900; margin-bottom: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">orbis<span style="color: #FF7A00;">•</span></h1>
-  <p align="center"><em>The Next-Generation Modern VLC Media Experience</em></p>
+  <p align="center"><em>The Universal Modern Media Player</em></p>
 </p>
 
 <p align="center">
-  <strong>A modern, curved Material Design 3 overhaul inspired by VideoLAN VLC Media Player.</strong><br/>
+  <strong>A modern, curved Material Design 3 universal media player.</strong><br/>
   Featuring floating glassmorphism, dynamic Material You theming, a clean media library, dual-zone drag-and-drop, and an interactive Play Next queue.
 </p>
 
@@ -14,7 +14,7 @@
 
 ### 1. 🎨 Material Design 3 & Curved Organic Aesthetics
 - **Floating Pill HUD**: Playback controls float seamlessly over the media with backdrop blur, rounded pill containers (`rounded-4xl`), and glow lighting.
-- **Dynamic Theming**: Switch between iconic VLC Sunset Orange, Cyberpunk Cyan, Emerald Wave, Cosmic Purple, and Neon Rose.
+- **Dynamic Theming**: Switch between iconic Solar Amber, Cyberpunk Cyan, Emerald Wave, Cosmic Purple, and Neon Rose.
 - **Auto-Hiding Controls**: Controls smoothly fade out after 3 seconds of inactivity during video playback and reappear on cursor movement.
 
 ### 2. 🗂️ Brand-New Media Library
@@ -29,8 +29,9 @@
   - **Drop to Play Now**: Replaces current playback immediately.
   - **Drop to Play Next**: Injects the file directly to the top of your queue.
 
-### 4. 🎛️ VLC Heritage Power Tools
-- **10-Band Equalizer**: Parametric audio EQ with presets like *Bass Boost (VLC Style)*, *Vocal Clarity*, *Electronic / Dance*, *Rock & Metal*, and *Cinema*.
+### 4. 🎛️ Universal Playback & Pro Power Tools
+- **Universal Codec Engine**: Plays all video and audio formats including AVI, MKV, MP4, WebM, MOV, WMV, FLV, VOB, TS, MP3, FLAC, AAC, WAV, AC3, DTS, and live network streams.
+- **10-Band Equalizer**: Parametric audio EQ with presets like *Deep Bass Boost*, *Vocal Clarity*, *Electronic / Dance*, *Rock & Metal*, and *Cinema*.
 - **Real-Time Video Filters**: GPU-accelerated adjustments for Brightness, Contrast, Saturation, Hue Rotation, Grayscale, and Sepia.
 - **Network Stream Engine**: Open and stream live URLs (HLS `.m3u8`, MP4, HTTP live streams).
 - **Subtitles & Aspect Ratios**: Customizable subtitles and one-click aspect ratio switcher (Fit, Fill, 16:9, 4:3, 21:9 UltraWide).
@@ -38,7 +39,7 @@
 
 ---
 
-## ⌨️ Standard VLC Keyboard Shortcuts
+## ⌨️ Pro Keyboard Shortcuts
 
 | Shortcut | Action |
 | :--- | :--- |
@@ -85,10 +86,10 @@ npm run build
 - **Engine**: Electron 34 + React 19 + TypeScript
 - **Styling**: Tailwind CSS + Material Design 3 Tokens + Custom SVG Filter Pipeline
 - **Icons**: Lucide Icons
-- **Audio/Video**: HTML5 Multimedia Framework with live Web Audio API visualizer & GPU CSS filters
-- **Design Inspiration**: Juxtopposed's VLC Redesign & Google Material You Design Guidelines
+- **Audio/Video Engine**: Universal Multi-Format Engine with live Web Audio API visualizer & GPU CSS filters
+- **Design Guidelines**: Material You & Modern Organic Curved Glassmorphism
 
 ---
 
 ## 📜 License
-GPL-2.0-or-later (in the spirit of VideoLAN and VLC).
+GPL-2.0-or-later.

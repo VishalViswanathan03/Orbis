@@ -13,7 +13,7 @@ import {
 } from 'lucide-react';
 
 const ACCENT_COLORS = [
-  { name: 'VLC Sunset Orange', color: '#FF7A00' },
+  { name: 'Solar Amber', color: '#FF7A00' },
   { name: 'Cyberpunk Cyan', color: '#00E5FF' },
   { name: 'Emerald Wave', color: '#10B981' },
   { name: 'Cosmic Purple', color: '#A855F7' },
@@ -35,10 +35,47 @@ export const Header: React.FC = () => {
     setIsVideoEffectsOpen,
     setIsStreamModalOpen,
     importLocalFiles,
+    playMedia,
+    setLibraryItems,
   } = usePlayer();
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [showColorPicker, setShowColorPicker] = useState(false);
+
+  const handleOpenFiles = async () => {
+    const electronAPI = (window as any).electronAPI;
+    if (electronAPI?.openFileDialog) {
+      try {
+        const items = await electronAPI.openFileDialog();
+        if (items && items.length > 0) {
+          const newMediaItems = items.map((item: any, i: number) => ({
+            id: `local-${Date.now()}-${i}`,
+            title: item.meta?.title || item.filePath.split(/[\\/]/).pop()?.replace(/\.[^/.]+$/, "") || 'Media File',
+            artist: 'Local Media',
+            album: item.meta?.type === 'video' ? 'Local Video' : 'Local Music',
+            duration: item.meta?.duration || 0,
+            url: item.streamUrl,
+            thumbnail: item.meta?.type === 'video'
+              ? 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?q=80&w=800&auto=format&fit=crop'
+              : 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?q=80&w=800&auto=format&fit=crop',
+            type: item.meta?.type || 'video',
+            resolution: item.meta?.resolution || '1080p',
+            codec: 'Universal',
+            fileSize: 'Local File',
+            addedAt: new Date().toISOString().split('T')[0],
+            isFavorite: false,
+            isCustomLocal: true,
+          }));
+          setLibraryItems((prev: any[]) => [...newMediaItems, ...prev]);
+          playMedia(newMediaItems[0]);
+          return;
+        }
+      } catch (err) {
+        console.error('Failed to open native file dialog:', err);
+      }
+    }
+    fileInputRef.current?.click();
+  };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
@@ -121,7 +158,7 @@ export const Header: React.FC = () => {
       <div className="flex items-center space-x-1 shrink-0">
         {/* Open Files (Icon-only) */}
         <button
-          onClick={() => fileInputRef.current?.click()}
+          onClick={handleOpenFiles}
           className={`p-2 rounded-full border transition-colors ${
             isDark
               ? 'bg-white/5 hover:bg-white/10 border-white/10'

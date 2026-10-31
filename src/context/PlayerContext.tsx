@@ -157,7 +157,7 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   // Views & UI
   const [currentView, setCurrentView] = useState<'player' | 'library'>('player');
   const [isQueueOpen, setIsQueueOpen] = useState<boolean>(false);
-  const [accentColor, setAccentColor] = useState<string>('#FF7A00'); // Iconic VLC Orange
+  const [accentColor, setAccentColor] = useState<string>('#FF7A00'); // Solar Amber Accent
   const [libraryCategory, setLibraryCategory] = useState<LibraryCategory>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
 
@@ -344,39 +344,62 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     setQueue(prev => prev.filter(item => item.id !== id));
   };
 
-  const importLocalFiles = (files: FileList | File[]) => {
+  const importLocalFiles = async (files: FileList | File[]) => {
     const newItems: MediaItem[] = [];
-    Array.from(files).forEach((file, index) => {
-      const isVideo = file.type.startsWith('video/') || /\.(mp4|mkv|avi|mov|webm|flv|wmv|ts|m4v)$/i.test(file.name);
-      const isAudio = file.type.startsWith('audio/') || /\.(mp3|wav|flac|aac|ogg|m4a|wma|opus)$/i.test(file.name);
-      if (!isVideo && !isAudio) return;
+    const electronAPI = (window as any).electronAPI;
+    const fileArray = Array.from(files);
 
-      const blobUrl = URL.createObjectURL(file);
+    for (let index = 0; index < fileArray.length; index++) {
+      const file = fileArray[index];
+      const isVideo = file.type.startsWith('video/') || /\.(mp4|mkv|avi|mov|webm|flv|wmv|ts|m2ts|vob|mpg|mpeg|rmvb|3gp|ogv|m4v)$/i.test(file.name);
+      const isAudio = file.type.startsWith('audio/') || /\.(mp3|wav|flac|aac|ogg|m4a|wma|opus|ac3|dts|ape|alac)$/i.test(file.name);
+      if (!isVideo && !isAudio) continue;
+
+      const diskPath = (file as any).path;
+      let finalUrl = '';
+      let meta: any = {
+        duration: 0,
+        resolution: isVideo ? '1080p' : 'Audio',
+        type: isVideo ? 'video' : 'audio',
+        title: file.name.replace(/\.[^/.]+$/, "")
+      };
+
+      if (electronAPI && diskPath) {
+        try {
+          finalUrl = await electronAPI.getMediaUrl(diskPath);
+          const probed = await electronAPI.probeMedia(diskPath);
+          if (probed) meta = { ...meta, ...probed };
+        } catch {
+          finalUrl = URL.createObjectURL(file);
+        }
+      } else {
+        finalUrl = URL.createObjectURL(file);
+      }
+
       const sizeMb = (file.size / (1024 * 1024)).toFixed(1) + ' MB';
 
       newItems.push({
         id: `local-${Date.now()}-${index}`,
-        title: file.name.replace(/\.[^/.]+$/, ""),
+        title: meta.title || file.name.replace(/\.[^/.]+$/, ""),
         artist: 'Local Media',
-        album: isVideo ? 'Local Video' : 'Local Music',
-        duration: 0,
-        url: blobUrl,
-        thumbnail: isVideo
+        album: meta.type === 'video' ? 'Local Video' : 'Local Music',
+        duration: meta.duration || 0,
+        url: finalUrl,
+        thumbnail: meta.type === 'video'
           ? 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?q=80&w=800&auto=format&fit=crop'
           : 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?q=80&w=800&auto=format&fit=crop',
-        type: isVideo ? 'video' : 'audio',
-        resolution: isVideo ? '1080p' : 'Audio',
-        codec: file.type || 'Native',
+        type: meta.type as any,
+        resolution: meta.resolution as any,
+        codec: file.type || 'Universal',
         fileSize: sizeMb,
         addedAt: new Date().toISOString().split('T')[0],
         isFavorite: false,
         isCustomLocal: true,
       });
-    });
+    }
 
     if (newItems.length > 0) {
       setLibraryItems(prev => [...newItems, ...prev]);
-      // Play the first imported item
       playMedia(newItems[0]);
     }
   };
@@ -403,43 +426,7 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   };
 
   return (
-    <PlayerContext.Provider
-      value={{
-        currentMedia,
-        isPlaying,
-        setIsPlaying,
-        currentTime,
-        setCurrentTime,
-        duration,
-        setDuration,
-        volume,
-        isMuted,
-        playbackRate,
-        aspectRatio,
-        repeatMode,
-        isShuffle,
-        currentView,
-        setCurrentView,
-        isQueueOpen,
-        setIsQueueOpen,
-        queue,
-        queueIndex,
-        playMedia,
-        playNext,
-        addToQueue,
-        reorderQueue,
-        removeFromQueue,
-        clearQueue,
-        nextTrack,
-        prevTrack,
-        togglePlay,
-        seek,
-        setVolumeLevel,
-        toggleMute,
-        setPlaybackRate,
-        setAspectRatio,
-        setRepeatMode,
-        setIsShuffle,
+    <PlayerContext.Provider value={{
         videoFilters,
         setVideoFilters,
         resetVideoFilters,

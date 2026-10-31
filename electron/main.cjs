@@ -1,7 +1,10 @@
 const { app, BrowserWindow, ipcMain, dialog, Menu } = require('electron');
 const path = require('path');
+const { createStreamServer, probeMediaFile } = require('./streamServer.cjs');
 
 let mainWindow;
+let streamServerPort = null;
+let streamServerBinary = null;
 
 function createWindow() {
   mainWindow = new BrowserWindow({
@@ -10,7 +13,7 @@ function createWindow() {
     minWidth: 920,
     minHeight: 600,
     backgroundColor: '#090B0F',
-    title: 'Orbis — Modern VLC Media Player',
+    title: 'Orbis — Universal Media Player',
     roundedCorners: true,
     autoHideMenuBar: true,
     show: true,
@@ -39,19 +42,65 @@ function createWindow() {
   });
 }
 
+// Universal Stream & Probe IPC Handlers
+ipcMain.handle('media:getUrl', async (_event, filePath) => {
+  if (!filePath) return null;
+  if (filePath.startsWith('http://') || filePath.startsWith('https://')) {
+    return filePath;
+  }
+  if (!streamServerPort) {
+    return `file://${filePath}`;
+  }
+  return `http://127.0.0.1:${streamServerPort}/stream?file=${encodeURIComponent(filePath)}`;
+});
+
+ipcMain.handle('media:probe', async (_event, filePath) => {
+  if (!filePath) return null;
+  return await probeMediaFile(filePath, streamServerBinary);
+});
+
 // IPC Handlers for Native Dialogs
 ipcMain.handle('dialog:openFile', async () => {
   if (!mainWindow) return null;
   const result = await dialog.showOpenDialog(mainWindow, {
     properties: ['openFile', 'multiSelections'],
     filters: [
-      { name: 'All Media Files', extensions: ['mp4', 'mkv', 'avi', 'mov', 'webm', 'mp3', 'wav', 'flac', 'aac', 'ogg'] },
-      { name: 'Video Files', extensions: ['mp4', 'mkv', 'avi', 'mov', 'webm', 'flv', 'wmv'] },
-      { name: 'Audio Files', extensions: ['mp3', 'wav', 'flac', 'aac', 'ogg', 'm4a'] },
+      {
+        name: 'All Media Files',
+        extensions: [
+          'mp4', 'mkv', 'avi', 'mov', 'webm', 'wmv', 'flv', 'vob', 'mpg', 'mpeg', 'ts', 'm2ts', 'rmvb', '3gp', 'ogv',
+          'mp3', 'wav', 'flac', 'aac', 'ogg', 'm4a', 'wma', 'ac3', 'dts', 'opus', 'ape'
+        ]
+      },
+      {
+        name: 'Video Files',
+        extensions: ['mp4', 'mkv', 'avi', 'mov', 'webm', 'wmv', 'flv', 'vob', 'mpg', 'mpeg', 'ts', 'm2ts', 'rmvb', '3gp', 'ogv']
+      },
+      {
+        name: 'Audio Files',
+        extensions: ['mp3', 'wav', 'flac', 'aac', 'ogg', 'm4a', 'wma', 'ac3', 'dts', 'opus', 'ape']
+      },
       { name: 'All Files', extensions: ['*'] }
     ]
   });
-  return result;
+
+  if (result.canceled || !result.filePaths.length) return null;
+
+  const probedItems = [];
+  for (const filePath of result.filePaths) {
+    const meta = await probeMediaFile(filePath, streamServerBinary);
+    const streamUrl = streamServerPort
+      ? `http://127.0.0.1:${streamServerPort}/stream?file=${encodeURIComponent(filePath)}`
+      : `file://${filePath}`;
+
+    probedItems.push({
+      filePath,
+      streamUrl,
+      meta
+    });
+  }
+
+  return probedItems;
 });
 
 ipcMain.handle('dialog:openFolder', async () => {
@@ -78,7 +127,17 @@ ipcMain.handle('window:close', () => {
   mainWindow?.close();
 });
 
-app.whenReady().then(createWindow);
+app.whenReady().then(async () => {
+  try {
+    const { port, binary } = await createStreamServer(app.isPackaged, process.resourcesPath);
+    streamServerPort = port;
+    streamServerBinary = binary;
+    console.log(`Orbis Universal Media Engine running on port ${port}`);
+  } catch (err) {
+    console.warn('Universal Media Engine failed to bind port:', err);
+  }
+  createWindow();
+});
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
