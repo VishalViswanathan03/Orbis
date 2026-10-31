@@ -10,20 +10,23 @@ import { VideoEffectsModal } from './components/VideoEffectsModal';
 import { StreamModal } from './components/StreamModal';
 
 const AppContent: React.FC = () => {
-  const { currentView } = usePlayer();
+  const { currentView, themeMode } = usePlayer();
+  const isDark = themeMode === 'dark';
 
   return (
-    <div className="flex flex-col h-screen w-screen bg-surface-lowest text-slate-100 overflow-hidden font-sans select-none">
-      {/* Top Header & Navigation */}
+    <div className={`flex flex-col h-screen w-screen overflow-hidden font-sans select-none transition-colors duration-200 ${
+      isDark ? 'bg-[#090A0F] text-slate-100' : 'bg-[#F8F9FC] text-slate-900'
+    }`}>
+      {/* Top Header */}
       <Header />
 
-      {/* Main Workspace (Player or Library + Sliding Play Next Queue) */}
+      {/* Main Workspace (Player or Library + Sliding Up Next Queue) */}
       <main className="flex-1 flex overflow-hidden relative">
         <div className="flex-1 flex flex-col h-full overflow-hidden relative">
           {currentView === 'player' ? <Player /> : <LibraryView />}
         </div>
 
-        {/* Play Next Queue Drawer */}
+        {/* Sliding Queue Drawer */}
         <PlayNextQueue />
       </main>
 

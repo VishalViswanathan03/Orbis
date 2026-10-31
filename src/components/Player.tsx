@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { usePlayer } from '../context/PlayerContext';
 import { FloatingControls } from './FloatingControls';
-import { Music, Radio, Volume2, Sparkles, AlertCircle } from 'lucide-react';
+import { Play, Pause, Music, AlertCircle, RefreshCw } from 'lucide-react';
 
 export const Player: React.FC = () => {
   const {
@@ -25,6 +25,7 @@ export const Player: React.FC = () => {
     videoFilters,
     subtitleConfig,
     accentColor,
+    themeMode,
     mediaRef,
   } = usePlayer();
 
@@ -38,14 +39,16 @@ export const Player: React.FC = () => {
   const [errorMessage, setErrorMessage] = useState('');
   const hideTimeoutRef = useRef<any>(null);
 
-  // Auto-hide floating controls on mouse inactivity
+  const isDark = themeMode === 'dark';
+
+  // Auto-hide floating controls on inactivity
   const showControlsTemporarily = () => {
     setControlsVisible(true);
     if (hideTimeoutRef.current) clearTimeout(hideTimeoutRef.current);
     if (isPlaying) {
       hideTimeoutRef.current = setTimeout(() => {
         setControlsVisible(false);
-      }, 3000);
+      }, 3500);
     }
   };
 
@@ -61,14 +64,16 @@ export const Player: React.FC = () => {
     };
   }, [isPlaying]);
 
-  // Video element sync
+  // Video element playback synchronization
   useEffect(() => {
     const video = mediaRef.current;
     if (!video) return;
 
+    setHasError(false);
     if (isPlaying) {
       video.play().catch(err => {
-        console.warn("Autoplay blocked or play failed:", err);
+        // Handled silently if autoplay restricted before user interaction
+        console.debug("Playback awaiting user gesture:", err);
       });
     } else {
       video.pause();
@@ -100,7 +105,6 @@ export const Player: React.FC = () => {
   // Keyboard Shortcuts (Standard VLC Keys)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Don't trigger if user is typing in an input
       if (['INPUT', 'TEXTAREA'].includes((e.target as HTMLElement).tagName)) {
         return;
       }
@@ -157,11 +161,11 @@ export const Player: React.FC = () => {
     if (!containerRef.current) return;
     if (!document.fullscreenElement) {
       containerRef.current.requestFullscreen().catch(err => {
-        console.error("Failed to enter fullscreen:", err);
+        console.error("Fullscreen error:", err);
       });
     } else {
       document.exitFullscreen().catch(err => {
-        console.error("Failed to exit fullscreen:", err);
+        console.error("Exit fullscreen error:", err);
       });
     }
   };
@@ -188,7 +192,7 @@ export const Player: React.FC = () => {
     filter: `brightness(${videoFilters.brightness}%) contrast(${videoFilters.contrast}%) saturate(${videoFilters.saturation}%) hue-rotate(${videoFilters.hueRotate}deg) grayscale(${videoFilters.grayscale}%) invert(${videoFilters.invert}%) sepia(${videoFilters.sepia}%)`,
   };
 
-  // Aspect ratio classes
+  // Aspect ratio styling
   const getAspectRatioClass = () => {
     switch (aspectRatio) {
       case '16:9': return 'aspect-video object-contain';
@@ -199,7 +203,7 @@ export const Player: React.FC = () => {
     }
   };
 
-  // Animated Audio Visualizer simulation for Audio Tracks
+  // Animated Audio Visualizer simulation
   useEffect(() => {
     if (currentMedia?.type !== 'audio' || !visualizerCanvasRef.current) return;
     const canvas = visualizerCanvasRef.current;
@@ -211,22 +215,22 @@ export const Player: React.FC = () => {
 
     const render = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      const bars = 48;
+      const bars = 40;
       const barWidth = canvas.width / bars;
 
       for (let i = 0; i < bars; i++) {
-        const heightMultiplier = isPlaying ? Math.sin(phase + i * 0.3) * 0.5 + 0.5 : 0.08;
-        const barHeight = heightMultiplier * (canvas.height * 0.75);
+        const heightMultiplier = isPlaying ? Math.sin(phase + i * 0.35) * 0.45 + 0.55 : 0.06;
+        const barHeight = heightMultiplier * (canvas.height * 0.8);
         const x = i * barWidth;
         const y = canvas.height - barHeight;
 
         const grad = ctx.createLinearGradient(0, y, 0, canvas.height);
         grad.addColorStop(0, accentColor);
-        grad.addColorStop(1, '#FF550022');
+        grad.addColorStop(1, `${accentColor}11`);
 
         ctx.fillStyle = grad;
         ctx.beginPath();
-        ctx.roundRect(x + 2, y, barWidth - 4, barHeight, [4, 4, 0, 0]);
+        ctx.roundRect(x + 3, y, barWidth - 6, barHeight, [3, 3, 0, 0]);
         ctx.fill();
       }
 
@@ -238,14 +242,24 @@ export const Player: React.FC = () => {
     return () => cancelAnimationFrame(animationId);
   }, [currentMedia, isPlaying, accentColor]);
 
+  const handleRetry = () => {
+    setHasError(false);
+    if (mediaRef.current) {
+      mediaRef.current.load();
+      mediaRef.current.play().catch(() => {});
+    }
+  };
+
   return (
     <div
       ref={containerRef}
       onMouseMove={showControlsTemporarily}
       onMouseEnter={showControlsTemporarily}
-      className="relative flex-1 bg-black flex items-center justify-center overflow-hidden select-none"
+      className={`relative flex-1 flex items-center justify-center overflow-hidden select-none transition-colors ${
+        isDark ? 'bg-black' : 'bg-slate-950'
+      }`}
     >
-      {/* Primary Media Element (HTML5 Video supports both audio and video streams) */}
+      {/* Primary Video Element */}
       {currentMedia && (
         <video
           ref={mediaRef}
@@ -261,80 +275,89 @@ export const Player: React.FC = () => {
             if (e.currentTarget.duration && !isNaN(e.currentTarget.duration)) {
               setDuration(e.currentTarget.duration);
             }
+            setHasError(false);
           }}
           onEnded={nextTrack}
           onPlay={() => setIsPlaying(true)}
           onPause={() => setIsPlaying(false)}
-          onError={e => {
-            console.error("Media load error:", e);
-            setHasError(true);
-            setErrorMessage("Cannot decode or stream media source.");
+          onError={() => {
+            // Only set error if there is an actual source that failed
+            if (currentMedia?.url) {
+              setHasError(true);
+              setErrorMessage("Stream format unreachable or offline.");
+            }
           }}
           onLoadedData={() => setHasError(false)}
           playsInline
         />
       )}
 
-      {/* Audio Visualizer Viewport (When playing music / podcasts) */}
-      {currentMedia?.type === 'audio' && (
+      {/* Center Subtle Play Button (Visible when paused on video) */}
+      {!isPlaying && currentMedia?.type === 'video' && (
         <div
-          className="w-full h-full flex flex-col items-center justify-center p-8 bg-gradient-to-b from-surface-dim via-surface-lowest to-black cursor-pointer"
           onClick={togglePlay}
+          className="absolute inset-0 flex items-center justify-center cursor-pointer pointer-events-auto bg-black/20 backdrop-blur-[1px] transition-opacity animate-fade-in"
         >
-          {/* Curved Album Art Card */}
-          <div className="relative w-64 h-64 md:w-80 md:h-80 rounded-4xl overflow-hidden shadow-glow-pill border border-white/10 mb-8 group">
-            <img
-              src={currentMedia.thumbnail}
-              alt={currentMedia.title}
-              className={`w-full h-full object-cover transition-transform duration-700 ${
-                isPlaying ? 'scale-105' : 'scale-100 grayscale-20'
-              }`}
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex flex-col justify-end p-6">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-orbis-400">Now Playing Audio</span>
-              <h2 className="text-xl font-bold text-white truncate">{currentMedia.title}</h2>
-              <p className="text-sm text-slate-300 truncate">{currentMedia.artist}</p>
-            </div>
-          </div>
-
-          {/* Glowing Frequency Bars Canvas */}
-          <div className="w-full max-w-xl h-24">
-            <canvas ref={visualizerCanvasRef} width={600} height={100} className="w-full h-full" />
+          <div
+            className="w-16 h-16 rounded-full flex items-center justify-center text-white shadow-2xl hover:scale-110 active:scale-95 transition-transform"
+            style={{ backgroundColor: `${accentColor}E6` }}
+          >
+            <Play size={26} className="fill-white translate-x-0.5" />
           </div>
         </div>
       )}
 
-      {/* Stream / Live Indicator Viewport (if stream without video) */}
-      {currentMedia?.type === 'stream' && (
-        <div className="absolute top-6 left-6 z-20 flex items-center space-x-2 px-3 py-1.5 rounded-full bg-black/60 backdrop-blur-md border border-white/10">
-          <span className="w-2.5 h-2.5 rounded-full bg-red-500 animate-ping" />
-          <span className="text-xs font-bold uppercase tracking-wider text-white">Live Stream</span>
+      {/* Audio Visualizer Viewport (When playing music) */}
+      {currentMedia?.type === 'audio' && (
+        <div
+          className={`w-full h-full flex flex-col items-center justify-center p-8 cursor-pointer transition-colors ${
+            isDark ? 'bg-gradient-to-b from-[#10141D] to-black' : 'bg-gradient-to-b from-slate-100 to-white'
+          }`}
+          onClick={togglePlay}
+        >
+          {/* Curved Artwork */}
+          <div className="relative w-56 h-56 md:w-64 md:h-64 rounded-3xl overflow-hidden shadow-2xl border border-white/10 mb-6 group">
+            <img
+              src={currentMedia.thumbnail}
+              alt={currentMedia.title}
+              className={`w-full h-full object-cover transition-transform duration-700 ${
+                isPlaying ? 'scale-105' : 'scale-100'
+              }`}
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex flex-col justify-end p-5">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-orbis-400">Audio Track</span>
+              <h2 className="text-base font-bold text-white truncate">{currentMedia.title}</h2>
+              <p className="text-xs text-slate-300 truncate">{currentMedia.artist}</p>
+            </div>
+          </div>
+
+          {/* Sound wave visualizer */}
+          <div className="w-full max-w-md h-16">
+            <canvas ref={visualizerCanvasRef} width={500} height={80} className="w-full h-full" />
+          </div>
         </div>
       )}
 
       {/* Subtitles Overlay */}
       {subtitleConfig.enabled && currentMedia?.type === 'video' && isPlaying && (
-        <div
-          className="absolute bottom-28 left-0 right-0 z-20 flex justify-center pointer-events-none px-6 text-center"
-        >
+        <div className="absolute bottom-24 left-0 right-0 z-20 flex justify-center pointer-events-none px-6 text-center">
           <span
-            className="px-4 py-1.5 rounded-2xl font-semibold backdrop-blur-sm shadow-xl inline-block"
+            className="px-3.5 py-1 rounded-xl font-semibold backdrop-blur-sm shadow-lg inline-block"
             style={{
               fontSize: `${subtitleConfig.fontSize}px`,
               color: subtitleConfig.color,
               backgroundColor: subtitleConfig.backgroundColor,
             }}
           >
-            {/* Subtitle simulation placeholder or track text */}
-            {currentMedia.title} — High Fidelity Sound
+            {currentMedia.title}
           </span>
         </div>
       )}
 
       {/* Floating Bottom HUD Controls */}
       <div
-        className={`absolute bottom-6 left-0 right-0 z-30 transition-all duration-300 pointer-events-auto ${
-          controlsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6 pointer-events-none'
+        className={`absolute bottom-5 left-0 right-0 z-30 transition-all duration-300 pointer-events-auto ${
+          controlsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'
         }`}
       >
         <FloatingControls
@@ -345,14 +368,20 @@ export const Player: React.FC = () => {
         />
       </div>
 
-      {/* Error state alert */}
+      {/* Gentle Error Notification Toast */}
       {hasError && (
-        <div className="absolute top-20 z-30 px-5 py-3 rounded-2xl bg-red-950/80 border border-red-500/50 text-white flex items-center space-x-3 shadow-2xl backdrop-blur-lg">
-          <AlertCircle size={20} className="text-red-400" />
+        <div className="absolute top-6 z-30 px-4 py-2.5 rounded-2xl bg-slate-900/90 border border-slate-700 text-white flex items-center space-x-3 shadow-xl backdrop-blur-md animate-fade-in">
+          <AlertCircle size={16} className="text-amber-400 shrink-0" />
           <div className="text-xs">
-            <p className="font-bold">Playback Notice</p>
-            <p className="text-slate-300">{errorMessage}</p>
+            <p className="font-semibold">{errorMessage}</p>
           </div>
+          <button
+            onClick={handleRetry}
+            className="ml-2 px-2.5 py-1 rounded-full bg-white/10 hover:bg-white/20 text-[11px] font-medium flex items-center space-x-1 transition-colors"
+          >
+            <RefreshCw size={11} />
+            <span>Retry</span>
+          </button>
         </div>
       )}
     </div>

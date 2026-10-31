@@ -14,7 +14,10 @@ export const EqualizerModal: React.FC = () => {
     selectedPreset,
     setPreset,
     accentColor,
+    themeMode,
   } = usePlayer();
+
+  const isDark = themeMode === 'dark';
 
   if (!isEqualizerOpen) return null;
 
@@ -29,28 +32,32 @@ export const EqualizerModal: React.FC = () => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-md flex items-center justify-center p-4 select-none animate-fade-in">
-      <div className="w-full max-w-2xl bg-surface-dim/95 border border-white/10 rounded-4xl p-6 md:p-8 shadow-2xl relative">
+    <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center p-4 select-none animate-fade-in">
+      <div className={`w-full max-w-2xl border rounded-3xl p-6 md:p-7 shadow-2xl relative transition-colors ${
+        isDark ? 'bg-[#121620] border-white/10 text-white' : 'bg-white border-slate-200 text-slate-900'
+      }`}>
         {/* Header */}
-        <div className="flex items-center justify-between pb-6 border-b border-white/10">
+        <div className={`flex items-center justify-between pb-4 border-b ${
+          isDark ? 'border-white/10' : 'border-slate-200'
+        }`}>
           <div className="flex items-center space-x-3">
             <div
-              className="w-10 h-10 rounded-full flex items-center justify-center text-white"
+              className="w-9 h-9 rounded-full flex items-center justify-center text-white"
               style={{ backgroundColor: accentColor }}
             >
-              <Sliders size={20} />
+              <Sliders size={18} />
             </div>
             <div>
-              <h3 className="text-lg font-bold text-white">Audio Equalizer & Presets</h3>
-              <p className="text-xs text-slate-400">10-Band VLC Heritage Hardware Parametric EQ</p>
+              <h3 className="text-base font-bold">Audio Equalizer & Presets</h3>
+              <p className="text-xs text-slate-400">10-Band Parametric EQ</p>
             </div>
           </div>
 
           <button
             onClick={() => setIsEqualizerOpen(false)}
-            className="p-2 rounded-full hover:bg-white/10 text-slate-400 hover:text-white transition-colors"
+            className="p-1.5 rounded-full text-slate-400 hover:text-white hover:bg-white/10 transition-colors"
           >
-            <X size={20} />
+            <X size={18} />
           </button>
         </div>
 

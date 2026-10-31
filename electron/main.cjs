@@ -13,24 +13,26 @@ function createWindow() {
     title: 'Orbis — Modern VLC Media Player',
     roundedCorners: true,
     autoHideMenuBar: true,
+    show: true,
     webPreferences: {
       preload: path.join(__dirname, 'preload.cjs'),
       nodeIntegration: false,
       contextIsolation: true,
-      webSecurity: false, // Allows playing local media file:// protocols
+      webSecurity: false,
     },
   });
 
-  // Remove default menu bar for clean modern immersive aesthetic
   Menu.setApplicationMenu(null);
 
-  // If dev server URL is provided, use it; otherwise load built dist/index.html
-  const devServerUrl = process.env.VITE_DEV_SERVER_URL;
-  if (devServerUrl) {
-    mainWindow.loadURL(devServerUrl);
-  } else {
+  // Load Vite dev server if running, fallback to dist/index.html
+  mainWindow.loadURL('http://localhost:5173').catch(() => {
     mainWindow.loadFile(path.join(__dirname, '../dist/index.html'));
-  }
+  });
+
+  mainWindow.once('ready-to-show', () => {
+    mainWindow.show();
+    mainWindow.focus();
+  });
 
   mainWindow.on('closed', () => {
     mainWindow = null;

@@ -66,9 +66,11 @@ interface PlayerContextType {
   subtitleConfig: SubtitleConfig;
   setSubtitleConfig: React.Dispatch<React.SetStateAction<SubtitleConfig>>;
 
-  // Theme Accent
+  // Theme Accent & Mode
   accentColor: string;
   setAccentColor: (accent: string) => void;
+  themeMode: 'dark' | 'light';
+  toggleThemeMode: () => void;
 
   // Modals
   isEqualizerOpen: boolean;
@@ -110,7 +112,7 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
   // Library & Initial Queue
   const [libraryItems, setLibraryItems] = useState<MediaItem[]>(() => {
-    const saved = localStorage.getItem('orbis_library');
+    const saved = localStorage.getItem('orbis_library_v2');
     if (saved) {
       try { return JSON.parse(saved); } catch (e) { /* ignore */ }
     }
@@ -120,6 +122,26 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [queue, setQueue] = useState<MediaItem[]>([SAMPLE_MEDIA[0], SAMPLE_MEDIA[1], SAMPLE_MEDIA[4]]);
   const [queueIndex, setQueueIndex] = useState<number>(0);
   const [currentMedia, setCurrentMedia] = useState<MediaItem | null>(SAMPLE_MEDIA[0]);
+
+  // Theme Mode
+  const [themeMode, setThemeMode] = useState<'dark' | 'light'>(() => {
+    return (localStorage.getItem('orbis_theme') as 'dark' | 'light') || 'dark';
+  });
+
+  useEffect(() => {
+    localStorage.setItem('orbis_theme', themeMode);
+    if (themeMode === 'dark') {
+      document.documentElement.classList.add('dark');
+      document.documentElement.classList.remove('light');
+    } else {
+      document.documentElement.classList.remove('dark');
+      document.documentElement.classList.add('light');
+    }
+  }, [themeMode]);
+
+  const toggleThemeMode = () => {
+    setThemeMode(prev => (prev === 'dark' ? 'light' : 'dark'));
+  };
 
   // Playback States
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
@@ -160,7 +182,7 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
   // Save library changes
   useEffect(() => {
-    localStorage.setItem('orbis_library', JSON.stringify(libraryItems));
+    localStorage.setItem('orbis_library_v2', JSON.stringify(libraryItems));
   }, [libraryItems]);
 
   const resetVideoFilters = () => {
@@ -429,6 +451,8 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         setSubtitleConfig,
         accentColor,
         setAccentColor,
+        themeMode,
+        toggleThemeMode,
         isEqualizerOpen,
         setIsEqualizerOpen,
         isVideoEffectsOpen,

@@ -117,21 +117,21 @@ export const DropZoneOverlay: React.FC = () => {
           }}
           onDragLeave={() => setActiveTarget(null)}
           onDrop={handlePlayNowDrop}
-          className={`rounded-5xl border-3 border-dashed flex flex-col items-center justify-center p-8 transition-all duration-300 cursor-pointer ${
+          className={`rounded-3xl border-2 border-dashed flex flex-col items-center justify-center p-6 transition-all duration-200 cursor-pointer ${
             activeTarget === 'now'
-              ? 'scale-103 bg-white/10 shadow-glow-pill'
-              : 'bg-surface-mid/70 border-white/20 hover:border-white/40'
+              ? 'scale-102 bg-white/10 shadow-2xl'
+              : 'bg-black/40 border-white/20 hover:border-white/40'
           }`}
           style={activeTarget === 'now' ? { borderColor: accentColor } : {}}
         >
           <div
-            className="w-20 h-20 rounded-full flex items-center justify-center text-white mb-4 shadow-xl transition-transform"
+            className="w-16 h-16 rounded-full flex items-center justify-center text-white mb-3 shadow-lg transition-transform"
             style={{ backgroundColor: accentColor }}
           >
-            <Play size={36} className="fill-white translate-x-1" />
+            <Play size={28} className="fill-white translate-x-0.5" />
           </div>
-          <h3 className="text-xl font-bold text-white mb-1">Drop to Play Now</h3>
-          <p className="text-xs text-slate-400 text-center">Replaces current playback immediately</p>
+          <h3 className="text-lg font-bold text-white mb-1">Drop to Play Now</h3>
+          <p className="text-xs text-slate-400 text-center">Plays dropped file immediately</p>
         </div>
 
         {/* Drop Zone: PLAY NEXT */}
@@ -142,17 +142,17 @@ export const DropZoneOverlay: React.FC = () => {
           }}
           onDragLeave={() => setActiveTarget(null)}
           onDrop={handlePlayNextDrop}
-          className={`rounded-5xl border-3 border-dashed flex flex-col items-center justify-center p-8 transition-all duration-300 cursor-pointer ${
+          className={`rounded-3xl border-2 border-dashed flex flex-col items-center justify-center p-6 transition-all duration-200 cursor-pointer ${
             activeTarget === 'next'
-              ? 'scale-103 bg-white/10 shadow-glow-pill border-sky-400'
-              : 'bg-surface-mid/70 border-white/20 hover:border-white/40'
+              ? 'scale-102 bg-white/10 shadow-2xl border-sky-400'
+              : 'bg-black/40 border-white/20 hover:border-white/40'
           }`}
         >
-          <div className="w-20 h-20 rounded-full bg-sky-500 flex items-center justify-center text-white mb-4 shadow-xl transition-transform">
-            <ListPlus size={36} />
+          <div className="w-16 h-16 rounded-full bg-sky-500 flex items-center justify-center text-white mb-3 shadow-lg transition-transform">
+            <ListPlus size={28} />
           </div>
-          <h3 className="text-xl font-bold text-white mb-1">Drop to Play Next</h3>
-          <p className="text-xs text-slate-400 text-center">Inserts right next at top of queue</p>
+          <h3 className="text-lg font-bold text-white mb-1">Drop to Play Next</h3>
+          <p className="text-xs text-slate-400 text-center">Adds to top of queue</p>
         </div>
       </div>
     </div>
