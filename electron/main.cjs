@@ -14,7 +14,7 @@ function createWindow() {
     roundedCorners: true,
     autoHideMenuBar: true,
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js'),
+      preload: path.join(__dirname, 'preload.cjs'),
       nodeIntegration: false,
       contextIsolation: true,
       webSecurity: false, // Allows playing local media file:// protocols
@@ -24,12 +24,10 @@ function createWindow() {
   // Remove default menu bar for clean modern immersive aesthetic
   Menu.setApplicationMenu(null);
 
-  // In development, load from Vite local server
-  const isDev = process.env.NODE_ENV === 'development' || !app.isPackaged;
-  if (isDev) {
-    mainWindow.loadURL('http://localhost:5173').catch(() => {
-      mainWindow.loadFile(path.join(__dirname, '../dist/index.html'));
-    });
+  // If dev server URL is provided, use it; otherwise load built dist/index.html
+  const devServerUrl = process.env.VITE_DEV_SERVER_URL;
+  if (devServerUrl) {
+    mainWindow.loadURL(devServerUrl);
   } else {
     mainWindow.loadFile(path.join(__dirname, '../dist/index.html'));
   }
