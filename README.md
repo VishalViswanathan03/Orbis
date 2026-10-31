@@ -91,5 +91,15 @@ npm run build
 
 ---
 
+## 🔏 Windows Digital Signature & Publisher Verification
+
+Official Windows releases (`.exe`) are digitally signed with SHA-256 Authenticode for publisher **Vishal-VN**.
+
+To establish trust on Windows:
+- **Instant launch**: Click **"More info"** &rarr; **"Run anyway"** on Microsoft Defender SmartScreen.
+- **One-click system trust**: Double-click `Trust-Orbis-Certificate.bat` to add the public key (`public/orbis-signer.cer`) to your Trusted Publishers store.
+
+---
+
 ## 📜 License
 GPL-2.0-or-later.

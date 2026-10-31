@@ -42,6 +42,11 @@ jobs:
 
       - name: Build and Publish Electron Package
         uses: samuelmeuli/action-electron-builder@v1
+        env:
+          WIN_CSC_LINK: ${{ matrix.os == 'windows-latest' && secrets.WIN_CSC_LINK || '' }}
+          WIN_CSC_KEY_PASSWORD: ${{ matrix.os == 'windows-latest' && secrets.WIN_CSC_KEY_PASSWORD || '' }}
+          CSC_LINK: ${{ matrix.os == 'windows-latest' && secrets.WIN_CSC_LINK || '' }}
+          CSC_KEY_PASSWORD: ${{ matrix.os == 'windows-latest' && secrets.WIN_CSC_KEY_PASSWORD || '' }}
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           release: true
