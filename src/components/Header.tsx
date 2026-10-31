@@ -51,7 +51,7 @@ export const Header: React.FC = () => {
   const isDark = themeMode === 'dark';
 
   return (
-    <header className={`h-15 px-5 flex items-center justify-between border-b transition-colors duration-200 select-none z-40 ${
+    <header className={`relative h-15 px-5 flex items-center justify-between border-b transition-colors duration-200 select-none z-40 ${
       isDark
         ? 'bg-[#0E1118]/90 border-white/5 text-slate-100 backdrop-blur-xl'
         : 'bg-white/90 border-slate-200 text-slate-800 backdrop-blur-xl'
@@ -83,8 +83,8 @@ export const Header: React.FC = () => {
         </div>
       </div>
 
-      {/* Center: Clean Segmented View Capsule */}
-      <div className={`flex items-center p-1 rounded-full border transition-colors ${
+      {/* Center: Absolute Pixel-Perfect Screen Centering for View Switcher */}
+      <div className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center p-1 rounded-full border transition-colors shadow-sm ${
         isDark ? 'bg-white/5 border-white/10' : 'bg-slate-100 border-slate-200'
       }`}>
         <button
@@ -126,7 +126,7 @@ export const Header: React.FC = () => {
           }`}
           title="Open Local Files"
         >
-          <FolderOpen size={14} className="text-orbis-500" />
+          <FolderOpen size={14} style={{ color: accentColor }} />
           <span className="hidden sm:inline">Open</span>
         </button>
 

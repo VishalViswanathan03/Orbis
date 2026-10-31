@@ -76,7 +76,7 @@ export const PlayNextQueue: React.FC = () => {
         isDark ? 'border-white/5' : 'border-slate-200'
       }`}>
         <div className="flex items-center space-x-2">
-          <ListMusic size={16} className="text-orbis-500" />
+          <ListMusic size={16} style={{ color: accentColor }} />
           <h3 className="font-bold text-xs uppercase tracking-wider">
             Up Next
           </h3>

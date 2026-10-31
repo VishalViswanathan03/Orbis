@@ -101,7 +101,7 @@ export const DropZoneOverlay: React.FC = () => {
     <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md p-10 flex flex-col justify-center items-center select-none animate-fade-in pointer-events-auto">
       <div className="text-center mb-8">
         <div className="inline-flex items-center space-x-2 px-4 py-1.5 rounded-full bg-white/10 border border-white/20 mb-3 text-sm text-slate-200">
-          <Sparkles size={16} className="text-orbis-400" />
+          <Sparkles size={16} style={{ color: accentColor }} />
           <span>Orbis Instant Ingestion</span>
         </div>
         <h2 className="text-3xl font-extrabold text-white tracking-tight">Drop Media to Play</h2>
